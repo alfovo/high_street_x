@@ -1,9 +1,25 @@
+# Since this data is not real, I'm not validating it at the moment. For a later script, I 
+# would like to include validations for true/false characteristics like mustache, glasses 
+# or beard, handle outliers, and make sure that there aren't duplicate start periods in the data
+
 import pandas as pd
 
 # force dates and times to match up between dataframes by setting 
 # year, month, day, hour and minutes to '2017-08-21 00:30'
 def make_fake_datetime_matching(dt):
 	return dt.to_pydatetime().replace(hour=0, minute=30, year=2017, month=8, day=21)
+
+# make data more readable and fun! 
+# I'm assuming 1 and 2 indicate the number of X chromosomes
+def convert_gender(gender):
+	return 'female' if gender == 1 else 'male'
+
+# Based on the gender breakdown, I'm assuming 1 is yes and 2 is no
+def convert_characteristics(characteristic):
+	if characteristic == 1:
+		return True
+	else:
+		return False
 
 
 # since the data doesn't match up we'll have to fake it for experimentation purposes
@@ -32,6 +48,10 @@ parse_dates = ['period_start']
 ava_df = pd.read_csv("data/ava_data.csv", parse_dates=parse_dates, skiprows=15)
 
 ava_df = setup_df(ava_df, 'period_start')
+ava_df['gender'] = ava_df['gender'].map(lambda x: convert_gender(x))
+ava_df['mustache'] = ava_df['mustache'].map(lambda x: convert_characteristics(x))
+ava_df['beard'] = ava_df['beard'].map(lambda x: convert_characteristics(x))
+ava_df['glasses'] = ava_df['glasses'].map(lambda x: convert_characteristics(x))
 
 # join dataframes on their fake_start_times
 result = pd.merge(ava_df, cms_df, on=['fake_start_time'])
